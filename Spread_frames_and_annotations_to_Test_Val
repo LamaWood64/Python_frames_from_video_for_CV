@@ -1,0 +1,49 @@
+import os
+import random
+import shutil
+
+IMG_TRAIN = "/Users/anastasia/Desktop/horse_Eat_Original/data/images/train"
+IMG_VAL = "/Users/anastasia/Desktop/horse_Eat_Original/data/images/val"
+
+LABEL_TRAIN = "/Users/anastasia/Desktop/horse_Eat_Original/data/labels/train"
+LABEL_VAL = "/Users/anastasia/Desktop/horse_Eat_Original/data/labels/val"
+
+os.makedirs(IMG_VAL, exist_ok=True)
+os.makedirs(LABEL_VAL, exist_ok=True)
+
+all_images = os.listdir(IMG_TRAIN)
+num_to_move = len(all_images) // 5
+
+selected_images = random.sample(all_images, num_to_move)
+
+print(f"Selected to move {num_to_move} frames.")
+
+for img_file in selected_images:
+    # Paths
+    src_img_path = os.path.join(IMG_TRAIN, img_file)
+    dst_img_path = os.path.join(IMG_VAL, img_file)
+
+    base_name, _ = os.path.splitext(img_file)
+    anno_file = base_name + ".txt"
+    src_anno_path = os.path.join(LABEL_TRAIN, anno_file)
+    dst_anno_path = os.path.join(LABEL_VAL, anno_file)
+
+    # Copy files
+    shutil.copy2(src_img_path, dst_img_path)
+    print(f"Copied frame: {img_file}")
+
+    if os.path.exists(src_anno_path):
+        shutil.copy2(src_anno_path, dst_anno_path)
+        print(f"Copied annotation: {anno_file}")
+    else:
+        print(f"Error: annotation for {img_file} was not found.")
+
+    # DEl from train
+    os.remove(src_img_path)
+    print(f"Frame deleted from train: {img_file}")
+
+    if os.path.exists(src_anno_path):
+        os.remove(src_anno_path)
+        print(f"Annotation deleted from train: {anno_file}")
+
+print("Move and delete task is completed.")
